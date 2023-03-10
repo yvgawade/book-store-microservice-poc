@@ -1,0 +1,42 @@
+server:
+  port: 8072
+ 
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8070/eureka/
+      
+
+
+      
+spring:
+  cloud:
+    loadbalancer.ribbon.enabled: false
+    gateway:
+        routes:
+        - id: book-service
+          uri: lb://book-service
+          predicates:
+          - Path=/book/**
+          filters:
+          - RewritePath=/book/(?<path>.*), /$\{path}
+          - RemoveRequestHeader= Cookie,Set-Cookie
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+          - Path=/order/**
+          filters:
+          - RewritePath=/order/(?<path>.*), /$\{path}
+          - RemoveRequestHeader= Cookie,Set-Cookie
+            
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+        
+        
